@@ -17,12 +17,12 @@ def main(grid):
         for loc in np.argwhere(grid == h):
             for neighbour in loc + np.array([[1, 0], [-1, 0], [0, 1], [0, -1]]):
                 if tuple(neighbour) in reachable_9s and grid[*neighbour] == grid[*loc] + 1:
-                    reachable_9s[tuple(loc)] |= reachable_9s[tuple(neighbour)]
-                    ratings[tuple(loc)] += ratings[tuple(neighbour)]
+                    reachable_9s[*loc] |= reachable_9s[*neighbour]
+                    ratings[*loc] += ratings[*neighbour]
 
     return (
-        sum([len(reachable_9s[tuple(loc)]) for loc in np.argwhere(grid == 0)]),
-        sum([ratings[tuple(loc)] for loc in np.argwhere(grid == 0)]),
+        sum([len(reachable_9s[*loc]) for loc in np.argwhere(grid == 0)]),
+        sum([ratings[*loc] for loc in np.argwhere(grid == 0)]),
     )
 
 
