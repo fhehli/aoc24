@@ -16,7 +16,7 @@ def parse_input(argv):
     return grid, G, H
 
 
-def main(grid, G, H, start, end, cheat_length):
+def main(grid, G, H, cheat_length):
     start, end = next(loc for loc in grid if grid[loc] == "S"), next(loc for loc in grid if grid[loc] == "E")
     D_G = dict(nx.all_pairs_shortest_path_length(G))
     D_G[end][end] = 0
