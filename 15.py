@@ -1,3 +1,4 @@
+from copy import deepcopy
 import sys
 
 
@@ -28,6 +29,57 @@ def part_one(grid, moves):
     return int(sum([100 * pos.real + pos.imag for pos, c in grid.items() if c == "O"]))
 
 
+def part_two(grid, moves):
+    boxes, walls = set(), set()
+    for p, c in grid.items():
+        if c == "#":
+            walls.add(p.real + p.imag * 2j)
+            walls.add(p.real + p.imag * 2j + 1j)
+        elif c == "O":
+            boxes.add(p.real + p.imag * 2j)
+        elif c == "@":
+            pos = p.real + p.imag * 2j
+
+    for move in moves:
+        if move.imag < 0:
+            n_boxes = 0
+            while pos - (n_boxes + 1) * 2j in boxes:
+                n_boxes += 1
+            if pos - n_boxes * 2j - 1j in walls:
+                continue
+            for i in range(n_boxes):
+                boxes.remove(pos - (i + 1) * 2j)
+                boxes.add(pos - (i + 1) * 2j - 1j)
+        elif move.imag > 0:
+            n_boxes = 0
+            while pos + n_boxes * 2j + 1j in boxes:
+                n_boxes += 1
+            if pos + n_boxes * 2j + 1j in walls:
+                continue
+            for i in range(n_boxes):
+                boxes.remove(pos + i * 2j + 1j)
+                boxes.add(pos + (i + 1) * 2j)
+        else:
+            if pos + move in walls:
+                continue
+            stack = set()
+            row = boxes & {pos + move - 1j, pos + move}
+            while row:
+                stack |= row
+                new_row = boxes & {pos + move + i for pos in row for i in [-1j, 0, 1j]}
+                row = new_row
+            if any(p + move in walls or p + move + 1j in walls for p in stack):
+                continue
+            for p in stack:
+                boxes.remove(p)
+            for p in stack:
+                boxes.add(p + move)
+        pos += move
+
+    return sum(100 * pos.real + pos.imag for pos in boxes)
+
+
 if __name__ == "__main__":
     inp = parse_input(sys.argv)
-    print(f"Part 1: {part_one(*inp)}")
+    print(f"Part 1: {part_one(*deepcopy(inp))}")
+    print(f"Part 2: {part_two(*inp)}")
